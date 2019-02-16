@@ -1,0 +1,2 @@
+-keep class * extends com.android.systemui.statusbar.phone.StatusBar
+-keep class * extends com.android.systemui.SystemUIFactory
