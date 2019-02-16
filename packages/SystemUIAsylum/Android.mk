@@ -1,5 +1,5 @@
 LOCAL_PATH := $(call my-dir)
-SYSTEMUI_PATH := ../../../../../frameworks/base/packages/SystemUI
+SYSTEMUI_PATH := ../../../../frameworks/base/packages/SystemUI
 
 include $(CLEAR_VARS)
 
