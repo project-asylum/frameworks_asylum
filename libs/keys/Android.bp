@@ -1,0 +1,5 @@
+android_library {
+    name: "com.asylum.keys",
+    srcs: [ "src/**/*.java" ],
+    libs: [ "com.asylum.actions", "com.asylum.utils", "com.asylum.core" ],
+}

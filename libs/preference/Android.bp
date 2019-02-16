@@ -1,0 +1,14 @@
+android_library {
+    name: "com.asylum.preference",
+    srcs: [ "src/**/*.java" ],
+    libs: [
+        "com.asylum.core",
+        "com.asylum.actions",
+        "com.asylum.utils",
+        "android-support-v4",
+        "android-support-v7-cardview",
+        "android-support-v7-preference",
+        "android-support-v7-recyclerview",
+        "android-support-v14-preference",
+    ],
+}
