@@ -24,7 +24,7 @@ import com.asylum.core.internal.statusbar.IAsylumStatusBar;
 /** @hide */
 interface IActionsService {
 
-    void registerSlimStatusBar(IAsylumStatusBar bar);
+    void registerAsylumStatusBar(IAsylumStatusBar bar);
 
     void advancedReboot(String reason);
 

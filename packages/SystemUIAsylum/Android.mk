@@ -32,7 +32,10 @@ LOCAL_STATIC_ANDROID_LIBRARIES := \
     android-slices-view \
     android-slices-builders \
     android-arch-core-runtime \
-    android-arch-lifecycle-extensions
+    android-arch-lifecycle-extensions \
+    com.asylum.core \
+    com.asylum.utils \
+    com.asylum.actions
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
     SystemUI-tags \

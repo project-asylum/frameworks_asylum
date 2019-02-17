@@ -64,9 +64,9 @@ public class ActionsManager {
         return null;
     }
 
-    public void registerSlimStatusBar(IAsylumStatusBar bar) {
+    public void registerAsylumStatusBar(IAsylumStatusBar bar) {
         try {
-            getService().registerSlimStatusBar(bar);
+            getService().registerAsylumStatusBar(bar);
         } catch (RemoteException e) {
             // ignore
         }
