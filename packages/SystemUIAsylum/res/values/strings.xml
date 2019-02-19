@@ -30,7 +30,7 @@
     <string name="battery_level_template"><xliff:g id="level" example="45">%d</xliff:g>%%</string>
 
     <!-- Battery level text while charging [CHAR LIMIT=2] -->
-    <string name="battery_level_template_charging"><xliff:g id="level" example="45">%d</xliff:g>~</string>
+    <string name="battery_level_template_charging"><xliff:g id="level" example="45">%d</xliff:g>\u26A1\uFE0E</string>
 
 </resources>
 
