@@ -64,6 +64,8 @@ public class HardwareKeyHandler {
 
     private HashMap<Integer, HardwareButton> mButtons = new HashMap<>();
 
+    private KeyHandler mKeyHandler;
+
     // Custom hardware key rebinding
     private int mDeviceHardwareKeys;
     private boolean mKeysDisabled;
@@ -105,8 +107,13 @@ public class HardwareKeyHandler {
         mContext = context;
         mHandler = handler;
 
+        if (context.getResources().getBoolean(
+                com.android.internal.R.bool.config_enableKeyHandler)) {
+            mKeyHandler = new KeyHandler(context);
+        }
+
         mDeviceHardwareKeys = mContext.getResources().getInteger(
-                R.integer.config_deviceHardwareKeys);
+                com.android.internal.R.integer.config_deviceHardwareKeys);
 
         mLongPressVibePattern = getLongIntArray(mContext.getResources(),
                 com.android.internal.R.array.config_longPressVibePattern);
@@ -150,8 +157,18 @@ public class HardwareKeyHandler {
         return false;
     }
 
-    public boolean handleKeyEvent(int keyCode, int repeatCount, boolean down,
-            boolean canceled, boolean longpress, boolean keyguardOn) {
+    public boolean handleKeyEvent(KeyEvent event, int repeatCount, boolean down,
+            boolean canceled, boolean longpress, boolean keyguardOn, boolean interactive) {
+        Log.d("TEST", "handleKeyEvent");
+
+        if (!interactive) {
+            // handle screen off gestures
+            if (mKeyHandler != null && mKeyHandler.handleKeyEvent(event)) {
+                return true;
+            }
+        }
+
+        int keyCode = event.getKeyCode();
 
         if (isKeyDisabled(keyCode)) {
             return true;

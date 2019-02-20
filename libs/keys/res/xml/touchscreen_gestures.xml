@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<touchscreen-gestures xmlns:kc="http://schemas.android.com/apk/res-auto">
+    <gesture
+        kc:name="@string/gesture_arrow_down_title"
+        kc:path="/proc/touchpanel/down_arrow_enable"
+        kc:scancode="252"
+        kc:defaultAction="**ring_vib_silent**" />
+    <gesture
+        kc:name="@string/gesture_arrow_left_title"
+        kc:path="/proc/touchpanel/left_arrow_enable"
+        kc:scancode="253"
+        kc:defaultAction="**media_previous**" />
+    <gesture
+        kc:name="@string/gesture_arrow_right_title"
+        kc:path="/proc/touchpanel/right_arrow_enable"
+        kc:scancode="254"
+        kc:defaultAction="**media_next**" />
+    <gesture
+        kc:name="@string/gesture_arrow_up_title"
+        kc:path="/proc/touchpanel/up_arrow_enable"
+        kc:scancode="255"
+        kc:defaultAction="**torch**" />
+    <gesture
+        kc:name="@string/gesture_circle_title"
+        kc:path="/proc/touchpanel/letter_o_enable"
+        kc:scancode="250"
+        kc:defaultAction="**camera**" />
+    <gesture
+        kc:name="@string/gesture_double_swipe_title"
+        kc:path="/proc/touchpanel/double_swipe_enable"
+        kc:scancode="251"
+        kc:defaultAction="**media_play_pause**" />
+</touchscreen-gestures>

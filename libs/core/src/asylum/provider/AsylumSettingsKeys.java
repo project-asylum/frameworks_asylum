@@ -19,6 +19,11 @@ package asylum.provider;
 public final class AsylumSettingsKeys {
 
     public interface System {
+        /**
+         * Disables the hardware key actions
+         * @hide
+         */
+        public static final String DISABLE_HW_KEYS = "disable_hw_keys";
     }
 
     public interface Secure {
