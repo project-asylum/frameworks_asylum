@@ -53,14 +53,16 @@ public class SettingPreference extends Preference {
     }
 
     private void init(Context context, AttributeSet attrs) {
-        AttributeHelper a = new AttributeHelper(context, attrs, R.styleable.SettingPreference);
+        if (attrs != null) {
+            AttributeHelper a = new AttributeHelper(context, attrs, R.styleable.SettingPreference);
 
-        boolean hidePreference =
-                a.getBoolean(R.styleable.SettingPreference_hidePreference, false);
-        int hidePreferenceInt = a.getInt(R.styleable.SettingPreference_hidePreferenceInt, -1);
-        int intDep = a.getInt(R.styleable.SettingPreference_hidePreferenceIntDependency, 0);
-        if (hidePreference || hidePreferenceInt == intDep) {
-            setVisible(false);
+            boolean hidePreference =
+                    a.getBoolean(R.styleable.SettingPreference_hidePreference, false);
+            int hidePreferenceInt = a.getInt(R.styleable.SettingPreference_hidePreferenceInt, -1);
+            int intDep = a.getInt(R.styleable.SettingPreference_hidePreferenceIntDependency, 0);
+            if (hidePreference || hidePreferenceInt == intDep) {
+                setVisible(false);
+            }
         }
     }
 
