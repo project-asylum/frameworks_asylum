@@ -29,6 +29,7 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.service.dreams.DreamManagerInternal;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.util.Slog;
 import android.view.HapticFeedbackConstants;
@@ -44,30 +45,22 @@ import com.asylum.action.Action;
 import com.asylum.action.ActionConstants;
 import com.asylum.action.ActionsManager;
 
+import com.asylum.keys.parser.Key;
+import com.asylum.keys.parser.KeyCategory;
+import com.asylum.keys.parser.KeyParser;
+
 public class HardwareKeyHandler {
 
     private static final String TAG = "HardwareKeyHandler";
-
-    private static final int[] SUPPORTED_KEYS = {
-            KeyEvent.KEYCODE_HOME,
-            KeyEvent.KEYCODE_MENU,
-            KeyEvent.KEYCODE_BACK,
-            KeyEvent.KEYCODE_ASSIST,
-            KeyEvent.KEYCODE_CAMERA,
-            KeyEvent.KEYCODE_APP_SWITCH
-    };
 
     private static final AudioAttributes VIBRATION_ATTRIBUTES = new AudioAttributes.Builder()
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
             .build();
 
-    private HashMap<Integer, HardwareButton> mButtons = new HashMap<>();
-
-    private KeyHandler mKeyHandler;
+    private ArrayMap<Category, ArrayMap<Integer, Button>> mButtons = new ArrayMap<>();
 
     // Custom hardware key rebinding
-    private int mDeviceHardwareKeys;
     private boolean mKeysDisabled;
     private boolean mDisableVibration;
     private boolean mPreloadedRecentApps;
@@ -89,16 +82,23 @@ public class HardwareKeyHandler {
 
         void observe() {
             ContentResolver resolver = mContext.getContentResolver();
-            for (HardwareButton button : mButtons.values()) {
-                button.observe(this, resolver);
-                button.updateAssignments();
+            for (Category category : mButtons.keySet()) {
+                category.observe(this, resolver);
+                category.updateAssignments();
+                for (Button button : mButtons.get(category).values()) {
+                    button.observe(this, resolver);
+                    button.updateAssignments();
+                }
             }
         }
 
         @Override
         public void onChange(boolean selfChange) {
-            for (HardwareButton button : mButtons.values()) {
-                button.updateAssignments();
+            for (Category category : mButtons.keySet()) {
+                category.updateAssignments();
+                for (Button button : mButtons.get(category).values()) {
+                    button.updateAssignments();
+                }
             }
         }
     }
@@ -107,14 +107,6 @@ public class HardwareKeyHandler {
         mContext = context;
         mHandler = handler;
 
-        if (context.getResources().getBoolean(
-                com.android.internal.R.bool.config_enableKeyHandler)) {
-            mKeyHandler = new KeyHandler(context);
-        }
-
-        mDeviceHardwareKeys = mContext.getResources().getInteger(
-                com.android.internal.R.integer.config_deviceHardwareKeys);
-
         mLongPressVibePattern = getLongIntArray(mContext.getResources(),
                 com.android.internal.R.array.config_longPressVibePattern);
         mVirtualKeyVibePattern = getLongIntArray(mContext.getResources(),
@@ -122,9 +114,18 @@ public class HardwareKeyHandler {
 
         mVibrator = (Vibrator)context.getSystemService(Context.VIBRATOR_SERVICE);
 
-        for (int keyCode : SUPPORTED_KEYS) {
-            mButtons.put(keyCode, new HardwareButton(keyCode));
-        }
+       for (KeyCategory category : KeyParser.parseKeys(mContext).values()) {
+           Category cat = new Category(category.key);
+           mButtons.put(cat, new ArrayMap<Integer, Button>());
+           for (Key key : category.keys) {
+               if (key.supportsMultipleActions) {
+                   mButtons.get(cat).put(key.keyCode, new MultiFunctionButton(key.keyCode));
+               } else {
+                   mButtons.get(cat).put(key.keyCode,
+                           new SingleFunctionButton(key.keyCode, key.def));
+               }
+           }
+       }
 
         mHwKeySettingsObserver = new HwKeySettingsObserver(mHandler);
         mHwKeySettingsObserver.observe();
@@ -147,36 +148,26 @@ public class HardwareKeyHandler {
     }
 
     private boolean isKeyDisabled(int keyCode) {
-        if (mKeysDisabled) {
-            for (int i = 0; i < SUPPORTED_KEYS.length; i++) {
-                if (SUPPORTED_KEYS[i] == keyCode) {
-                    return true;
-                }
+        for (Category cat : mButtons.keySet()) {
+            if (mButtons.get(cat).containsKey(keyCode) && cat.mDisabled) {
+                return true;
             }
         }
         return false;
     }
 
-    public boolean handleKeyEvent(KeyEvent event, int repeatCount, boolean down,
-            boolean canceled, boolean longpress, boolean keyguardOn, boolean interactive) {
-        Log.d("TEST", "handleKeyEvent");
-
-        if (!interactive) {
-            // handle screen off gestures
-            if (mKeyHandler != null && mKeyHandler.handleKeyEvent(event)) {
-                return true;
-            }
-        }
-
+    public boolean handleKeyEvent(KeyEvent event, boolean keyguardOn, boolean interactive) {
         int keyCode = event.getKeyCode();
 
-        if (isKeyDisabled(keyCode)) {
-            return true;
-        }
+        Log.d("TEST", "key - " + KeyEvent.keyCodeToString(keyCode));
+        Log.d("TEST", "keyCode - " + event.getKeyCode());
 
-        HardwareButton button = mButtons.get(keyCode);
-        if (button != null)
-            return button.handleKeyEvent(repeatCount, down, canceled, longpress, keyguardOn);
+        for (Category category : mButtons.keySet()) {
+            Button button = mButtons.get(category).get(keyCode);
+            if (button != null) {
+                return button.handleKeyEvent(event, keyguardOn, interactive);
+            }
+        }
 
         return false;
     }
@@ -260,7 +251,58 @@ public class HardwareKeyHandler {
         return (val == null) ? def : val;
     }
 
-    private class HardwareButton {
+    private interface Button {
+        void observe(ContentObserver observer, ContentResolver resolver);
+        void updateAssignments();
+        boolean handleKeyEvent(KeyEvent event, boolean keyguardOn, boolean interactive);
+
+    }
+
+    private class SingleFunctionButton implements Button {
+        private int mKeyCode;
+        private String mAction;
+        private String mDefaultAction;
+        private String mSettingsKey;
+
+        SingleFunctionButton(int keyCode, String defaultAction) {
+            mKeyCode = keyCode;
+            mDefaultAction = defaultAction;
+            mSettingsKey = KeyParser.getPreferenceKey(keyCode);
+        }
+
+        @Override
+        public void observe(ContentObserver observer, ContentResolver resolver) {
+            resolver.registerContentObserver(AsylumSettings.System.getUriFor(
+                    mSettingsKey), false, observer, UserHandle.USER_ALL);
+        }
+
+        @Override
+        public void updateAssignments() {
+            mAction = getStringFromSettings(mSettingsKey, mDefaultAction);
+        }
+
+        @Override
+        public boolean handleKeyEvent(KeyEvent event, boolean keyguardOn, boolean interactive) {
+            android.util.Log.d("TEST", "action - " + mAction);
+            if (isDisabledByPhoneState()) {
+                return false;
+            }
+            if (interactive || event.getAction() != KeyEvent.ACTION_UP) {
+                return false;
+            }
+            Action.processAction(mContext, mAction, false);
+            return true;
+        }
+    }
+
+    private boolean isDisabledByPhoneState() {
+        //if (mTelecomManager != null) {
+        //    return mTelecomManager.isInCall() || mTelecomManager.isRinging();
+        //}
+        return false;
+    }
+
+    private class MultiFunctionButton implements Button {
 
         private String mKey;
         private int mKeyCode;
@@ -287,13 +329,14 @@ public class HardwareKeyHandler {
             }
         };
 
-        private HardwareButton(int keyCode) {
+        private MultiFunctionButton(int keyCode) {
             mKeyCode = keyCode;
             String key = KeyEvent.keyCodeToString(keyCode);
             mKey = key.replace("KEYCODE_", "key_").toLowerCase();
         }
 
-        private void observe(ContentObserver observer, ContentResolver resolver) {
+        @Override
+        public void observe(ContentObserver observer, ContentResolver resolver) {
             resolver.registerContentObserver(AsylumSettings.System.getUriFor(
                     (mKey + "_action")), false, observer,
                     UserHandle.USER_ALL);
@@ -305,7 +348,8 @@ public class HardwareKeyHandler {
                     UserHandle.USER_ALL);
         }
 
-        private void updateAssignments() {
+        @Override
+        public void updateAssignments() {
             mTapAction = getStringFromSettings((mKey + "_action"),
                     HwKeyHelper.getDefaultTapActionForKeyCode(mContext, mKeyCode));
             mDoubleTapAction = getStringFromSettings((mKey + "_double_tap_action"),
@@ -314,8 +358,14 @@ public class HardwareKeyHandler {
                     HwKeyHelper.getDefaultLongPressActionForKeyCode(mContext, mKeyCode));
         }
 
-        public boolean handleKeyEvent(int repeatCount, boolean down,
-                boolean canceled, boolean longpress, boolean keyguardOn) {
+        @Override
+        public boolean handleKeyEvent(KeyEvent event, boolean keyguardOn, boolean interactive) {
+            final boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
+            final boolean canceled = event.isCanceled();
+            final int flags = event.getFlags();
+            final boolean longpress = (flags & KeyEvent.FLAG_LONG_PRESS) != 0;
+            final int repeatCount = event.getRepeatCount();
+
             // If we have released the assistant key, and didn't do anything else
             // while it was pressed, then it is time to process the assistant action!
             if (!down && mButtonPressed) {
@@ -387,6 +437,26 @@ public class HardwareKeyHandler {
                 }
             }
             return true;
+        }
+    }
+
+    private class Category {
+        private String mKey;
+        private boolean mDisabled;
+
+        Category(String key) {
+            mKey = key;
+        }
+
+        public void observe(ContentObserver observer, ContentResolver resolver) {
+            resolver.registerContentObserver(AsylumSettings.System.getUriFor(
+                    (mKey + "_disabled")), false, observer,
+                    UserHandle.USER_ALL);
+        }
+
+        public void updateAssignments() {
+            mDisabled = AsylumSettings.System.getIntForUser(mContext.getContentResolver(),
+                    (mKey + "_disabled"), 0, UserHandle.USER_CURRENT) == 1;
         }
     }
 }

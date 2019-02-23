@@ -112,6 +112,7 @@ public class AsylumStatusBar extends StatusBar implements CommandQueue.Callbacks
 
     @Override
     public void toggleRecents() {
+        getComponent(com.android.systemui.statusbar.CommandQueue.class).toggleRecentApps();
     }
 
     protected class H extends Handler {
