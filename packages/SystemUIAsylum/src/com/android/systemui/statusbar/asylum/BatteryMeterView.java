@@ -131,7 +131,7 @@ public class BatteryMeterView extends View implements DemoMode,
                 AsylumSettings.Secure.STATUS_BAR_BATTERY_PERCENT, 0) == 1;
 
         int batteryStyle = AsylumSettings.Secure.getInt(resolver,
-                AsylumSettings.Secure.STATUS_BAR_BATTERY_STYLE, 2);
+                AsylumSettings.Secure.STATUS_BAR_BATTERY_STYLE, 0);
         BatteryMeterMode meterMode = BatteryMeterMode.BATTERY_METER_GONE;
         switch (batteryStyle) {
             case 0:
