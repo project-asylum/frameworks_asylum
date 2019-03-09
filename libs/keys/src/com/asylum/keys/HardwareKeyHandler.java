@@ -165,6 +165,9 @@ public class HardwareKeyHandler {
         for (Category category : mButtons.keySet()) {
             Button button = mButtons.get(category).get(keyCode);
             if (button != null) {
+                if (category.mDisabled) {
+                    return true;
+                }
                 return button.handleKeyEvent(event, keyguardOn, interactive);
             }
         }
