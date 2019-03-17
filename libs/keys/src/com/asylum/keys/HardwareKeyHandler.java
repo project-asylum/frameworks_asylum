@@ -33,6 +33,7 @@ import android.util.ArrayMap;
 import android.util.Log;
 import android.util.Slog;
 import android.view.HapticFeedbackConstants;
+import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.ViewConfiguration;
 
@@ -158,6 +159,7 @@ public class HardwareKeyHandler {
 
     public boolean handleKeyEvent(KeyEvent event, boolean keyguardOn, boolean interactive) {
         int keyCode = event.getKeyCode();
+        final boolean isVirtualKey = event.getDeviceId() == KeyCharacterMap.VIRTUAL_KEYBOARD;
 
         Log.d("TEST", "key - " + KeyEvent.keyCodeToString(keyCode));
         Log.d("TEST", "keyCode - " + event.getKeyCode());
@@ -165,13 +167,14 @@ public class HardwareKeyHandler {
         for (Category category : mButtons.keySet()) {
             Button button = mButtons.get(category).get(keyCode);
             if (button != null) {
-                if (category.mDisabled) {
+                if (category.mDisabled
+                        && (!category.mKey.equals("hw_keys")
+                                || (category.mKey.equals("hw_keys") && !isVirtualKey))) {
                     return true;
                 }
                 return button.handleKeyEvent(event, keyguardOn, interactive);
             }
         }
-
         return false;
     }
 
