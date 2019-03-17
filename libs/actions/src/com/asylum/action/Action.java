@@ -404,13 +404,13 @@ public class Action {
         final KeyEvent downEvent = new KeyEvent(now, now, KeyEvent.ACTION_DOWN,
                 keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
                 downflags,
-                InputDevice.SOURCE_KEYBOARD);
+                InputDevice.SOURCE_ASYLUM);
         im.injectInputEvent(downEvent, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
 
         final KeyEvent upEvent = new KeyEvent(now, now, KeyEvent.ACTION_UP,
                 keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
                 upflags,
-                InputDevice.SOURCE_KEYBOARD);
+                InputDevice.SOURCE_ASYLUM);
         im.injectInputEvent(upEvent, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
     }
 }
