@@ -124,7 +124,11 @@ public class Action {
                         return;
                     }
                     try {
-                        barService.expandNotificationsPanel();
+                        if (barService.panelRevealed()) {
+                            barService.collapsePanels();
+                        } else {
+                            barService.expandNotificationsPanel();
+                        }
                     } catch (RemoteException e) {}
                     return;
                 case ActionConstants.ACTION_SETTINGS_PANEL:
@@ -132,7 +136,11 @@ public class Action {
                         return;
                     }
                     try {
-                        barService.expandSettingsPanel(null);
+                        if (barService.panelRevealed()) {
+                            barService.collapsePanels();
+                        } else {
+                            barService.expandSettingsPanel(null);
+                        }
                     } catch (RemoteException e) {}
                     return;
                 case ActionConstants.ACTION_NOWONTAP:

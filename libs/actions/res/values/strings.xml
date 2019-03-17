@@ -32,8 +32,8 @@
     <string name="shortcut_action_kill">Kill app</string>
     <string name="shortcut_action_screenshot">Screenshot</string>
     <string name="shortcut_action_lastapp">Last app</string>
-    <string name="shortcut_action_notifications">Notifications</string>
-    <string name="shortcut_action_qs">Quicksettings panel</string>
+    <string name="shortcut_action_notifications">Toggle notifications</string>
+    <string name="shortcut_action_qs">Toggle quicksettings panel</string>
     <string name="shortcut_action_longpress">Longpress:</string>
     <string name="shortcut_action_doubletap">Double-Tap:</string>
     <string name="shortcut_action_select_action_longpress">Choose longpress action:</string>
