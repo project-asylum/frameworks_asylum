@@ -95,7 +95,7 @@ public class KeyParser {
                     if (category.name == null) {
                         throw new RuntimeException("Attribute 'name' is required");
                     }
-                    android.util.Log.d("TEST", "category - " + category.name);
+//                    android.util.Log.d("TEST", "category - " + category.name);
 
                     tv = sa.peekValue(Key_key);
                     if (tv != null && tv.type == TypedValue.TYPE_STRING) {

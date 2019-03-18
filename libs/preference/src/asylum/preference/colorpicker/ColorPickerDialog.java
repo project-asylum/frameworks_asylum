@@ -174,11 +174,11 @@ public class ColorPickerDialog extends Dialog implements SeekBar.OnSeekBarChange
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        Log.d("TEST", "width - " + mView.getMeasuredWidth());
+//        Log.d("TEST", "width - " + mView.getMeasuredWidth());
     }
 
     private void updateColor(int color, boolean force) {
-        Log.d("TEST", "color - " + color);
+//        Log.d("TEST", "color - " + color);
         if ((mColor == color && !force) || mUpdating) {
             return;
         }
