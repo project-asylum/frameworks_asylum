@@ -303,7 +303,7 @@ public final class AsylumSettings {
 
         public boolean putStringForUser(ContentResolver cr, String name, String value,
                 final int userHandle) {
-            Log.d("TEST", "putStringForUser - " + name + " : " + value);
+//            Log.d("TEST", "putStringForUser - " + name + " : " + value);
             try {
                 Bundle arg = new Bundle();
                 arg.putString(Settings.NameValueTable.VALUE, value);
@@ -320,7 +320,7 @@ public final class AsylumSettings {
         public String getStringForUser(ContentResolver cr, String name, final int userHandle) {
             final boolean isSelf = (userHandle == UserHandle.myUserId()) ||
                     (userHandle == UserHandle.USER_CURRENT);
-            Log.d("TEST", "getStringForUser - " + name);
+//            Log.d("TEST", "getStringForUser - " + name);
             if (isSelf) {
                 long newValuesVersion = SystemProperties.getLong(mVersionSystemProperty, 0);
 

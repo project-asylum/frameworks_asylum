@@ -183,7 +183,7 @@ public class AsylumSettingsProvider extends ContentProvider {
         final String newValue = (args == null)
                 ? null : args.getString(Settings.NameValueTable.VALUE);
 
-        android.util.Log.d("TEST", "before permission check");
+//        android.util.Log.d("TEST", "before permission check");
 
         // Framework can't do automatic permission checking for calls, so we need
         // to do it here.
@@ -193,7 +193,7 @@ public class AsylumSettingsProvider extends ContentProvider {
             enforceWritePermission(android.Manifest.permission.WRITE_SECURE_SETTINGS);
         }
 
-        android.util.Log.d("TEST", "request - " + request + " : newValue - " + newValue);
+//        android.util.Log.d("TEST", "request - " + request + " : newValue - " + newValue);
 
         // Put methods
         final ContentValues values = new ContentValues();
