@@ -412,6 +412,7 @@ public class HardwareKeyHandler {
 
             // Remember that camera key is pressed and handle special actions.
             if (down) {
+                Log.i(TAG, "if(down) : Entering");
                 if (!mPreloadedRecentApps &&
                         (mLongPressAction.equals(ActionConstants.ACTION_RECENTS)
                          || mDoubleTapAction.equals(ActionConstants.ACTION_RECENTS)
@@ -419,6 +420,7 @@ public class HardwareKeyHandler {
                     preloadRecentApps();
                 }
                 if (repeatCount == 0) {
+                    Log.i(TAG, "if(repeatCount == 0) : Entering");
                     mButtonPressed = true;
                     if (mDoubleTapPending) {
                         mDoubleTapPending = false;
@@ -430,17 +432,22 @@ public class HardwareKeyHandler {
                         }
                         Action.processAction(mContext, mDoubleTapAction, false);
                     }
+                    Log.i(TAG, "if(repeatCount == 0) : Leaving");
                 } else if (longpress) {
+                    Log.i(TAG, "if(longpress) : Entering");
                     if (!keyguardOn
                             && !mLongPressAction.equals(ActionConstants.ACTION_NULL)) {
                         if (!mLongPressAction.equals(ActionConstants.ACTION_RECENTS)) {
                             cancelPreloadRecentApps();
                         }
+                        Log.i(TAG, "if(longpress) : Executing long action");
                         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, false);
                         Action.processAction(mContext, mLongPressAction, false);
                         mButtonConsumed = true;
                     }
+                    Log.i(TAG, "if(longpress) : Leaving");
                 }
+                Log.i(TAG, "if(down) : Leaving");
             }
             return true;
         }
