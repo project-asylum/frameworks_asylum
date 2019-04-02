@@ -169,8 +169,8 @@ public class HardwareKeyHandler {
         int keyCode = event.getKeyCode();
         final boolean isVirtualKey = event.getDeviceId() == KeyCharacterMap.VIRTUAL_KEYBOARD;
 
-        Log.d("TEST", "key - " + KeyEvent.keyCodeToString(keyCode));
-        Log.d("TEST", "keyCode - " + event.getKeyCode());
+        Log.d(TAG, "key - " + KeyEvent.keyCodeToString(keyCode));
+        Log.d(TAG, "keyCode - " + event.getKeyCode());
 
         for (Category category : mButtons.keySet()) {
             Button button = mButtons.get(category).get(keyCode);
@@ -300,7 +300,8 @@ public class HardwareKeyHandler {
 
         @Override
         public boolean handleKeyEvent(KeyEvent event, boolean keyguardOn, boolean interactive) {
-            android.util.Log.d("TEST", "action - " + mAction);
+            
+            Log.i(TAG, "action - " + mAction);
             if (isDisabledByPhoneState()) {
                 return false;
             }
