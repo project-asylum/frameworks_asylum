@@ -53,6 +53,7 @@ import com.asylum.keys.parser.KeyParser;
 public class HardwareKeyHandler {
 
     private static final String TAG = "HardwareKeyHandler";
+    static final boolean DEBUG_INPUT = false;
 
     private static final AudioAttributes VIBRATION_ATTRIBUTES = new AudioAttributes.Builder()
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -169,8 +170,10 @@ public class HardwareKeyHandler {
         int keyCode = event.getKeyCode();
         final boolean isVirtualKey = event.getDeviceId() == KeyCharacterMap.VIRTUAL_KEYBOARD;
 
-        Log.d(TAG, "key - " + KeyEvent.keyCodeToString(keyCode));
-        Log.d(TAG, "keyCode - " + event.getKeyCode());
+        if (DEBUG_INPUT) {
+            Log.d(TAG, "key - " + KeyEvent.keyCodeToString(keyCode));
+            Log.d(TAG, "keyCode - " + event.getKeyCode());
+        }
 
         for (Category category : mButtons.keySet()) {
             Button button = mButtons.get(category).get(keyCode);
@@ -301,7 +304,7 @@ public class HardwareKeyHandler {
         @Override
         public boolean handleKeyEvent(KeyEvent event, boolean keyguardOn, boolean interactive) {
             
-            Log.i(TAG, "action - " + mAction);
+            if (DEBUG_INPUT) Log.i(TAG, "action - " + mAction);
             if (isDisabledByPhoneState()) {
                 return false;
             }
@@ -394,7 +397,7 @@ public class HardwareKeyHandler {
                 }
 
                 if (canceled) {
-                    Log.i(TAG, "Ignoring " + mKey + ", event canceled.");
+                    if (DEBUG_INPUT) Log.i(TAG, "Ignoring " + mKey + ", event canceled.");
                     return true;
                 }
 
@@ -424,7 +427,7 @@ public class HardwareKeyHandler {
 
             // Remember that camera key is pressed and handle special actions.
             if (down) {
-                Log.i(TAG, "if(down) : Entering");
+                if (DEBUG_INPUT) Log.i(TAG, "if(down) : Entering");
                 if (!mPreloadedRecentApps &&
                         (mLongPressAction.equals(ActionConstants.ACTION_RECENTS)
                          || mDoubleTapAction.equals(ActionConstants.ACTION_RECENTS)
@@ -432,7 +435,7 @@ public class HardwareKeyHandler {
                     preloadRecentApps();
                 }
                 if (repeatCount == 0) {
-                    Log.i(TAG, "if(repeatCount == 0) : Entering");
+                    if (DEBUG_INPUT) Log.i(TAG, "if(repeatCount == 0) : Entering");
                     mButtonPressed = true;
                     if (mDoubleTapPending) {
                         mDoubleTapPending = false;
@@ -444,22 +447,22 @@ public class HardwareKeyHandler {
                         }
                         Action.processAction(mContext, mDoubleTapAction, false);
                     }
-                    Log.i(TAG, "if(repeatCount == 0) : Leaving");
+                    if (DEBUG_INPUT) Log.i(TAG, "if(repeatCount == 0) : Leaving");
                 } else if (longpress) {
-                    Log.i(TAG, "if(longpress) : Entering");
+                    if (DEBUG_INPUT) Log.i(TAG, "if(longpress) : Entering");
                     if (!keyguardOn
                             && !mLongPressAction.equals(ActionConstants.ACTION_NULL)) {
                         if (!mLongPressAction.equals(ActionConstants.ACTION_RECENTS)) {
                             cancelPreloadRecentApps();
                         }
-                        Log.i(TAG, "if(longpress) : Executing long action");
+                        if (DEBUG_INPUT) Log.i(TAG, "if(longpress) : Executing long action");
                         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, false);
                         Action.processAction(mContext, mLongPressAction, false);
                         mButtonConsumed = true;
                     }
-                    Log.i(TAG, "if(longpress) : Leaving");
+                    if (DEBUG_INPUT) Log.i(TAG, "if(longpress) : Leaving");
                 }
-                Log.i(TAG, "if(down) : Leaving");
+                if (DEBUG_INPUT) Log.i(TAG, "if(down) : Leaving");
             }
             return true;
         }
