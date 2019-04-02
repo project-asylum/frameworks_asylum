@@ -157,7 +157,15 @@ public class HardwareKeyHandler {
         return false;
     }
 
-    public boolean handleKeyEvent(KeyEvent event, boolean keyguardOn, boolean interactive) {
+    public boolean handleKeyBeforeQueueing(KeyEvent event, boolean keyguardOn, boolean interactive) {
+        return handleKeyEvent(event, keyguardOn, interactive, false);
+    }
+
+    public boolean handleKeyBeforeDispatching(KeyEvent event, boolean keyguardOn, boolean interactive) {
+        return handleKeyEvent(event, keyguardOn, interactive, true);
+    }
+
+    private boolean handleKeyEvent(KeyEvent event, boolean keyguardOn, boolean interactive, boolean multiKey) {
         int keyCode = event.getKeyCode();
         final boolean isVirtualKey = event.getDeviceId() == KeyCharacterMap.VIRTUAL_KEYBOARD;
 
@@ -167,6 +175,10 @@ public class HardwareKeyHandler {
         for (Category category : mButtons.keySet()) {
             Button button = mButtons.get(category).get(keyCode);
             if (button != null) {
+                if ((multiKey && !(button instanceof MultiFunctionButton))
+                        || (!multiKey && (button instanceof MultiFunctionButton))) {
+                    return false;
+                }
                 if (category.mDisabled
                         && (!category.mKey.equals("hw_keys")
                                 || (category.mKey.equals("hw_keys") && !isVirtualKey))) {
