@@ -358,7 +358,6 @@ public class BatteryMeterView extends View implements DemoMode,
     }
 
     public int getColorForLevel(int percent) {
-
         // If we are in power save mode, always use the normal color.
         if (mPowerSaveEnabled) {
             return mColors[mColors.length-1];
