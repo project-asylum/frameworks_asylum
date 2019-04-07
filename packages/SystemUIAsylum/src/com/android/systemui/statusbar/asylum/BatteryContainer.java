@@ -54,6 +54,7 @@ public class BatteryContainer extends LinearLayout implements
     private boolean mShowBatteryTextCharging;
     private boolean mShowBatteryTextSpacer;
     private boolean mBatteryIsCharging;
+    private boolean mIsQS;
     private int mBatteryChargeLevel;
 
     private int mDarkModeBackgroundColor;
@@ -67,6 +68,11 @@ public class BatteryContainer extends LinearLayout implements
 
         mBatteryObserver = new BatterySettingsObserver(new Handler());
 
+        setColorsFromContext(context);
+    }
+
+    public void setColorsFromContext(Context context) {
+        if (context == null || mIsQS) return;
         Context dualToneDarkTheme = new ContextThemeWrapper(context,
                 Utils.getThemeAttr(context, R.attr.darkIconTheme));
         Context dualToneLightTheme = new ContextThemeWrapper(context,
@@ -77,11 +83,17 @@ public class BatteryContainer extends LinearLayout implements
         mLightModeFillColor = Utils.getColorAttr(dualToneLightTheme, R.attr.fillColor);
     }
 
+    public void setIsQS(Context context, boolean isQS) {
+        setColorsFromContext(context);
+        onDarkChanged(new Rect(), 0, DarkIconDispatcher.DEFAULT_ICON_TINT);
+        mIsQS = isQS;
+    }
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        mBattery = (BatteryMeterView) findViewById(R.id.battery);
+        mBattery = (BatteryMeterView) findViewById(R.id.asylum_battery);
         mSpacer = findViewById(R.id.battery_batterytext_spacer);
         mBatteryLevel = (TextView) findViewById(R.id.battery_level_text);
 
@@ -199,6 +211,7 @@ public class BatteryContainer extends LinearLayout implements
 
     @Override
     public void onDarkChanged(Rect area, float darkIntensity, int tint) {
+        if (mIsQS) return;
         float intensity = DarkIconDispatcher.isInArea(area, this) ? darkIntensity : 0;
         int foreground = getFillColor(intensity);
         int background = getBackgroundColor(intensity);
